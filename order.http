@@ -1,0 +1,35 @@
+### 주문 API 호출
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{
+  "memberNo": 1,
+  "productNo": 1,
+  "orderQuantity": 2
+}
+
+###
+
+### 주문 API 호출 - 다양한 예제
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{
+  "memberNo": 100,
+  "productNo": 10,
+  "orderQuantity": 5
+}
+
+###
+
+### 주문 API 호출 - 재고 부족 테스트 (재고보다 많은 수량 주문)
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{
+  "memberNo": 1,
+  "productNo": 1,
+  "orderQuantity": 100
+}
+
+###
