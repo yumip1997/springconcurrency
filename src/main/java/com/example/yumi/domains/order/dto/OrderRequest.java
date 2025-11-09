@@ -1,6 +1,6 @@
-package com.example.yumi.dto;
+package com.example.yumi.domains.order.dto;
 
-import com.example.yumi.entity.Order;
+import com.example.yumi.domains.order.entity.Order;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,8 +28,8 @@ public class OrderRequest {
         return new Order(memberNo, productNo, orderQuantity);
     }
 
-    public InventoryReduceRequest toInventoryReduceRequest() {
-        return new InventoryReduceRequest(productNo, orderQuantity);
+    public StockReduceRequest toStockReduceRequest(Long orderNo) {
+        return new StockReduceRequest(orderNo, productNo, orderQuantity);
     }
 }
 

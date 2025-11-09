@@ -16,10 +16,17 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
   cloud:
     aws:
       region:
         static: ap-northeast-2
+      credentials:
+        access-key:
+        secret-key:
+      sqs:
+        stock-queue:
+          name:
+          type:
+          url:
 
 

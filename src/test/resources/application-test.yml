@@ -1,6 +1,6 @@
 spring:
   application:
-    name: yumi-test
+    name: yumi
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
@@ -8,7 +8,7 @@ spring:
     password:
   h2:
     console:
-      enabled: false
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -16,7 +16,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
   cloud:
     aws:
       region:

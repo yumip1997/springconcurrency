@@ -1,4 +1,4 @@
-package com.example.yumi.entity;
+package com.example.yumi.domains.order.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

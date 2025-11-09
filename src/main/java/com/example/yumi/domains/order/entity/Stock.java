@@ -1,4 +1,4 @@
-package com.example.yumi.entity;
+package com.example.yumi.domains.order.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "inventory")
+@Table(name = "stock")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Inventory {
+public class Stock {
 
     @Id
     @Column(nullable = false, unique = true)
@@ -18,11 +18,7 @@ public class Inventory {
     @Column(nullable = false)
     private Integer stockQuantity;
 
-    // 낙관적 락을 위한 버전 필드
-    @Version
-    private Long version;
-
-    public Inventory(Long productNo, Integer stockQuantity) {
+    public Stock(Long productNo, Integer stockQuantity) {
         this.productNo = productNo;
         this.stockQuantity = stockQuantity;
     }

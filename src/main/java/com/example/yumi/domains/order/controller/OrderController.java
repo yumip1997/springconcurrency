@@ -1,7 +1,7 @@
-package com.example.yumi.controller;
+package com.example.yumi.domains.order.controller;
 
-import com.example.yumi.dto.OrderRequest;
-import com.example.yumi.service.OrderService;
+import com.example.yumi.domains.order.dto.OrderRequest;
+import com.example.yumi.domains.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

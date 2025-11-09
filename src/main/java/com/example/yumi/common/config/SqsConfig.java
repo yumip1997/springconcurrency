@@ -1,4 +1,4 @@
-package com.example.yumi.config;
+package com.example.yumi.common.config;
 
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
@@ -35,6 +35,7 @@ public class SqsConfig {
         return SqsTemplate.newTemplate(sqsAsyncClient());
     }
 
+    // 리스너 설정
     @Bean
     public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {
         return SqsMessageListenerContainerFactory
@@ -49,5 +50,6 @@ public class SqsConfig {
                 .sqsAsyncClient(sqsAsyncClient())
                 .build();
     }
+
 }
 

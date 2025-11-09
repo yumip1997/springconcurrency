@@ -1,6 +1,6 @@
-package com.example.yumi.repository;
+package com.example.yumi.domains.order.repository;
 
-import com.example.yumi.entity.Order;
+import com.example.yumi.domains.order.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

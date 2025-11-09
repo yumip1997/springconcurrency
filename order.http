@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "memberNo": 1,
   "productNo": 1,
-  "orderQuantity": 2
+  "orderQuantity": 1
 }
 
 ###
