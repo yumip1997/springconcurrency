@@ -16,12 +16,4 @@ public class ObjectMapperUtil {
             throw new RuntimeException(e);
         }
     }
-
-    public static <T> T fromJson(String json, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

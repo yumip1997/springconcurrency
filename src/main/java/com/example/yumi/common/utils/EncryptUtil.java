@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EncryptUtil {
@@ -19,8 +20,9 @@ public class EncryptUtil {
             }
 
             return hexString.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("SHA-256 해시 실패", e);
+        } catch (NoSuchAlgorithmException e) {
+            // SHA-256은 JDK에서 항상 지원되므로, 예외가 발생한다면 환경 문제임
+            throw new IllegalStateException("SHA-256 algorithm not found", e);
         }
     }
 }
