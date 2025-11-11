@@ -18,9 +18,22 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Long> createOrder(@Valid @RequestBody OrderRequest request) {
+    public ResponseEntity<Map<String, Object>> createOrder(@Valid @RequestBody OrderRequest request) {
         Long orderNo = orderService.order(request);
-        return ResponseEntity.ok(orderNo);
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderNo", orderNo);
+        response.put("message", "Sqs를 이용한 주문이 완료되었습니다");
+        return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/lua")
+    public ResponseEntity<Map<String, Object>> createOrderWithLua(@Valid @RequestBody OrderRequest request) {
+        Long orderNo = orderService.orderWithLua(request);
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderNo", orderNo);
+        response.put("message", "Lua 스크립트를 이용한 주문이 완료되었습니다");
+        return ResponseEntity.ok(response);
+    }
+
 }
 

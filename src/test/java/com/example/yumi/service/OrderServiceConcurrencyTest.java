@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,8 @@ class OrderServiceConcurrencyTest {
     private StockRepository stockRepository;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * FIFO SQS + MessageGroupId를 통한 동시성 제어 테스트
@@ -89,5 +92,81 @@ class OrderServiceConcurrencyTest {
         assertThat(stock.getStockQuantity()).isEqualTo(100 - threadCount);
     }
 
-}
+    /**
+     * Lua 스크립트를 이용한 동시성 제어 테스트
+     *
+     * 테스트 시나리오:
+     * 1. 초기 재고: 100개 (DB에 저장)
+     * 2. 동시에 10개의 쓰레드가 각각 1개씩 주문 (총 10개 주문)
+     * 3. Lua 스크립트의 원자적 연산으로 동시성 이슈 없이 재고 차감
+     * 4. 최종 재고: 90개 (100 - 10)
+     *
+     * 검증:
+     * - Lua 스크립트의 원자적 연산으로 동시성 이슈 없이 재고가 정확히 차감되는지 확인
+     * - Redis에서 최종 재고 확인
+     */
+    @Test
+    void luaScriptConcurrencyTest() throws InterruptedException {
+        // Given: 초기 재고 100개 설정 (DB에 저장)
+        redisTemplate.delete("stock:1");
+        stockRepository.deleteAll();
+        stockRepository.saveAndFlush(new Stock(1L, 100));
 
+        int threadCount = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+
+        // When: 10개의 쓰레드에서 동시에 주문 요청 (Lua 스크립트 사용)
+        for (int i = 0; i < threadCount; i++) {
+            int finalI = i;
+            executorService.execute(() -> {
+                try {
+                    OrderRequest request = OrderRequest.builder()
+                            .memberNo((long) (finalI + 1))
+                            .productNo(1L)  // 모두 같은 상품 주문
+                            .orderQuantity(1)
+                            .build();
+
+                    Long orderNo = orderService.orderWithLua(request);
+                    log.info("Lua 주문 완료: orderNo={}, memberNo={}", orderNo, finalI + 1);
+                } catch (Exception e) {
+                    log.error("Lua 주문 실패: memberNo={}", finalI + 1, e);
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        countDownLatch.await();
+        executorService.shutdown();
+
+        // Lua 스크립트는 동기적으로 실행되므로 대기 시간 불필요
+        // 다만 모든 쓰레드가 완료될 때까지 대기
+        Thread.sleep(1000); // 안전을 위한 짧은 대기
+
+        // Then: Redis에서 최종 재고 확인
+        String key = "stock:1";
+        Object redisStock = redisTemplate.opsForValue().get(key);
+        
+        log.info("=== Lua 테스트 결과 ===");
+        log.info("초기 재고: 100개");
+        log.info("주문 수량: {}개", threadCount);
+        log.info("Redis 최종 재고: {}개", redisStock);
+        log.info("예상 재고: {}개", 100 - threadCount);
+
+        assertThat(redisStock).isNotNull();
+
+        // Redis에서 가져온 값이 Number 타입인지 확인하고 비교
+        int finalStock;
+        if (redisStock instanceof Number) {
+            finalStock = ((Number) redisStock).intValue();
+        } else if (redisStock instanceof String) {
+            finalStock = Integer.parseInt((String) redisStock);
+        } else {
+            throw new AssertionError("Redis에서 가져온 재고 값의 타입이 예상과 다릅니다: " + redisStock.getClass());
+        }
+
+        assertThat(finalStock).isEqualTo(100 - threadCount);
+    }
+
+}

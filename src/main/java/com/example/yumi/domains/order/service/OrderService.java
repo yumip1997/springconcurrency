@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final StockService stockService;
+    private final StockServiceWithLua stockServiceWithLua;
 
     @Transactional
     public Long order(OrderRequest request) {
@@ -22,6 +23,17 @@ public class OrderService {
 
         // 2. 재고 차감 요청
         stockService.sendStockReduceRequest(request.toStockReduceRequest(savedOrder.getOrderNo()));
+
+        return savedOrder.getOrderNo();
+    }
+
+    @Transactional
+    public Long orderWithLua(OrderRequest request) {
+        // 1. 주문 entity 저장
+        Order savedOrder = orderRepository.save(request.toOrder());
+
+        // 2. 재고 차감 (Lua 스크립트 사용)
+        stockServiceWithLua.reduceStock(request.toStockReduceRequest(savedOrder.getOrderNo()));
 
         return savedOrder.getOrderNo();
     }

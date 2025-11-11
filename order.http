@@ -8,7 +8,16 @@ Content-Type: application/json
   "orderQuantity": 1
 }
 
-###
+### 주문 API 호출 - lua
+POST http://localhost:8080/api/orders/lua
+Content-Type: application/json
+
+{
+  "memberNo": 1,
+  "productNo": 1,
+  "orderQuantity": 1
+}
+
 
 ### 주문 API 호출 - 다양한 예제
 POST http://localhost:8080/api/orders
